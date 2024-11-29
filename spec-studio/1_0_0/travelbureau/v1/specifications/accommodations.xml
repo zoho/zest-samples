@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource name="accommodations" product="travelbureau" pre-loaded="false" specification="1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../xsd/spec.xsd">
+    <components>
+        <structure ref-name="Accommodation">
+            <property name="id" type="long_string" include-for="Request[update], Response[read]" required-for="all">
+                <description>The unique record ID of the accommodation.</description>
+            </property>
+            <property name="name" type="string" required-for="all" unique-for="all">
+                <description>Name of the accommodation place.</description>
+            </property>
+            <property name="check_in_date" type="datetime" required-for="response">
+                <description>Your arrival date at the place.</description>
+            </property>
+            <property name="check_out_date" type="datetime" required-for="response">
+                <description>The departure date indicating the end of your stay.</description>
+            </property>
+        </structure>
+
+        <request-body name="AccommodationBody">
+            <content>
+                <encode type="application/json" />
+                <structure-ref name="Accommodation" />
+            </content>
+        </request-body>
+
+        <argument name="ids" location="param" length="200" delimiter="," style="delimiter">
+            <description>Specify the ids for which the operation has to take place.</description>
+            <content>
+                <encode type="text/plain"/>
+                <structure>
+                    <property path="accommodations:$.id" type="long"/>
+                </structure>
+            </content>
+        </argument>
+    </components>
+
+    <info title="Accommodations" version="1">
+        <description>The accommodations hold the basic details for staying in a hotel, hostel, resort, vacation and rental. This API supports all the four CRUD operations to efficiently manage records in the resource.</description>
+
+        <terms-of-service-ref name="commons.Terms and Conditions"/>
+        <contact-details-ref name="commons.Travel Bureau Support"/>
+        <license-details-ref name="commons.Apache License 2"/>
+    </info>
+
+    <resource-config primary-structure="Accommodation">
+        <path-config data-extraction-path="$">
+            <primary path="$.id"/>
+        </path-config>
+    </resource-config>
+
+    <server-ref name="commons.TravelBureauAPIServer"/>
+
+    <url path="/api/v1/accommodations">
+        <operation category="read" method="get" name="Get Accommodations">
+            <description>This operation fetches the accommodation details available in the Travel Bureau. You can also provide the IDs of the records to get the details of particular records.</description>
+
+            <argument-ref name="ids"/>
+
+            <response status="200">
+                <content>
+                    <encode type="application/json" />
+                    <path-config data-extraction-path="$.accommodations" />
+                    <structure name="AccommodationsWrapper">
+                        <property name="accommodations" type="collections" required-for="response">
+                            <structure-ref name="Accommodation" />
+                        </property>
+                    </structure>
+                </content>
+            </response>
+            <response-ref name="commons.InvalidParamResponse" />
+
+            <authentication location="header" name="Authorization" schema="commons.OAuth2Schema" scopes="TravelBureau.accommodations.READ" type="oauth2"/>
+        </operation>
+
+        <operation category="create" method="post" name="Create Accommodation">
+            <description>It helps you to add new accommodation to the Travel Bureau.</description>
+
+            <request-body-ref name="AccommodationBody"/>
+
+            <response-ref name="commons.CreateSuccess"/>
+            <response-ref name="commons.BadRequest"/>
+            
+            <authentication location="header" name="Authorization" schema="commons.OAuth2Schema" scopes="TravelBureau.accommodations.CREATE" type="oauth2"/>
+        </operation>
+
+        <operation category="update" method="put" name="Update Accommodation">
+            <description>It aids you in updating the details of the existing accommodation in the Travel Bureau.</description>
+
+            <request-body-ref name="AccommodationBody"/>
+
+            <response-ref name="commons.UpdateSuccess"/>
+            <response-ref name="commons.BadRequest"/>
+
+            <authentication location="header" name="Authorization" schema="commons.OAuth2Schema" scopes="TravelBureau.accommodations.UPDATE" type="oauth2"/>
+        </operation>
+
+        <operation category="delete" method="delete" name="Delete Accommodations">
+            <description>This helps you to delete the existing accommodation records in the Travel Bureau.</description>
+
+            <argument-ref name="ids"/>
+
+            <response status="200">
+                <content>
+                    <encode type="application/json" />
+                    <path-config data-extraction-path="$.accommodations" />
+                    <structure name="AccommodationsWrapper">
+                        <property name="accommodations" type="collections" required-for="response">
+                            <structure-ref name="commons.DeleteActionResponse" />
+                        </property>
+                    </structure>
+                </content>
+            </response>
+            <response-ref name="commons.InvalidParamResponse" />
+
+            <authentication location="header" name="Authorization" schema="commons.OAuth2Schema" scopes="TravelBureau.accommodations.DELETE" type="oauth2"/>
+        </operation>
+    </url>
+
+    <authentication location="header" name="Authorization" schema="commons.OAuth2Schema" scopes="TravelBureau.accommodations.ALL" type="oauth2"/>
+</resource>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource name="travelers" product="travelbureau" pre-loaded="false" specification="1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../xsd/spec.xsd">
+    <components>
+        <structure ref-name="Traveler">
+            <property name="id" include-for="Request[update], Response[read]" required-for="all" type="long_string">
+                <description>The unique record ID of the traveler.</description>
+            </property>
+            <property name="name" type="collections" required-for="all">
+                <description>Name of the traveler.</description>
+                <ordered-structures>
+                    <structure>
+                        <property type="string" values="Mr,Miss,Mrs">
+                            <description>Provide any one of the titles from the possible values.</description>
+                        </property>
+                    </structure>
+                    <structure>
+                        <property regex="^[^\s]+$" type="string">
+                            <description>Provide your first name without any space.</description>
+                        </property>
+                    </structure>
+                    <structure>
+                        <property type="string">
+                            <description>Provide your family name.</description>
+                        </property>
+                    </structure>
+                    <structure>
+                        <property regex="^alias ([a-zA-Z\s]+)$" type="string">
+                            <description>Provide your nick name, if you have any.</description>
+                        </property>
+                    </structure>
+                </ordered-structures>
+            </property>
+            <property name="email" type="string" required-for="all" unique-for="all">
+                <description>Email ID of the traveler.</description>
+            </property>
+            <property name="services" type="collections" required-for="response">
+                <description>The services chosen by the traveler from the Travel Bureau. The possible values are **flight** and **train**.</description>
+                <structure-group name="services" type="one-of">
+                    <structure name="Flight" discriminator-value="flight">
+                        <property name="flight_no" type="string" required-for="response">
+                            <description>Number of the flight for the traveler's journey.</description>
+                        </property>
+                        <property name="departure_airport" type="string" required-for="response">
+                            <description>The airport name, where the journey begins.</description>
+                        </property>
+                        <property name="arrival_airport" type="string" required-for="response">
+                            <description>Name of the destination airport, where the journey concludes.</description>
+                        </property>
+                    </structure>
+                    <structure name="Train" discriminator-value="train">
+                        <property name="train_no" type="string" required-for="response">
+                            <description>Number of the train for the traveler's journey.</description>
+                        </property>
+                        <property name="departure_station" type="string" required-for="response">
+                            <description>The station name, where the journey begins.</description>
+                        </property>
+                        <property name="arrival_station" type="string" required-for="response">
+                            <description>Name of the destination station, where the journey concludes.</description>
+                        </property>
+                    </structure>
+                    <discriminator property-name="type" />
+                </structure-group>
+            </property>           
+        </structure>
+
+        <request-body name="TravelerRequestBody">
+            <content>
+                <encode type="application/json" />
+                <structure-ref name="Traveler" />
+            </content>
+        </request-body>
+
+        <argument name="ids" location="param" length="200" delimiter="," style="delimiter">
+            <description>Specify the id(s) for which the operation has to take place.</description>
+            <content>
+                <encode type="text/plain"/>
+                <structure>
+                    <property path="travelers:$.id" type="long"/>
+                </structure>
+            </content>
+        </argument>
+    </components>
+
+    <info title="Travelers" version="1">
+        <description>The details of the travelers are stored in this resource, where you can read, create, update and delete the records.</description>
+
+        <terms-of-service-ref name="commons.Terms and Conditions"/>
+        <contact-details-ref name="commons.Travel Bureau Support"/>
+        <license-details-ref name="commons.Apache License 2"/>
+    </info>
+
+    <resource-config primary-structure="Traveler">
+        <path-config data-extraction-path="$">
+            <primary path="$.id"/>
+        </path-config>
+    </resource-config>
+
+    <server-ref name="commons.TravelBureauAPIServer"/>
+
+    <url path="/api/v1/travelers">
+        <operation category="read" method="get" name="Get Travelers">
+            <description>This operation fetches the travelers details available in the Travel Bureau. You can also provide the IDs of the records to get the details of particular records.</description>
+
+            <argument-ref name="ids"/>
+
+            <response status="200">
+                <content>
+                    <encode type="application/json" />
+                    <path-config data-extraction-path="$.travelers" />
+                    <structure name="TravelersWrapper">
+                        <property name="travelers" type="collections" required-for="response">
+                            <structure-ref name="Traveler" />
+                        </property>
+                    </structure>
+                </content>
+            </response>
+            <response-ref name="commons.InvalidParamResponse" />
+
+            <authentication location="header" name="Authorization" schema="commons.OAuth2Schema" scopes="TravelBureau.travelers.READ" type="oauth2"/>
+        </operation>
+
+        <operation category="create" method="post" name="Add Traveler">
+            <description>It helps you to add new travelers data to the Travel Bureau.</description>
+
+            <request-body-ref name="TravelerRequestBody"/>
+
+            <response-ref name="commons.CreateSuccess"/>
+            <response-ref name="commons.BadRequest"/>
+
+            <authentication location="header" name="Authorization" schema="commons.OAuth2Schema" scopes="TravelBureau.travelers.CREATE" type="oauth2"/>
+        </operation>
+
+        <operation category="update" method="put" name="Update Traveler">
+            <description>It aids you in updating the details of the existing travelers data in the Travel Bureau.</description>
+
+            <request-body-ref name="TravelerRequestBody"/>
+
+            <response-ref name="commons.UpdateSuccess"/>
+            <response-ref name="commons.BadRequest"/>
+
+            <authentication location="header" name="Authorization" schema="commons.OAuth2Schema" scopes="TravelBureau.travelers.UPDATE" type="oauth2"/>
+        </operation>
+
+        <operation category="delete" method="delete" name="Delete Traveler">
+            <description>This helps you to delete the existing travelers records in the Travel Bureau.</description>
+
+            <argument-ref name="ids"/>
+
+            <response status="200">
+                <content>
+                    <encode type="application/json" />
+                    <path-config data-extraction-path="$.travelers" />
+                    <structure name="TravelersWrapper">
+                        <property name="travelers" type="collections" required-for="response">
+                            <structure-ref name="commons.DeleteActionResponse" />
+                        </property>
+                    </structure>
+                </content>
+            </response>
+            <response-ref name="commons.InvalidParamResponse" />
+
+            <authentication location="header" name="Authorization" schema="commons.OAuth2Schema" scopes="TravelBureau.travelers.DELETE" type="oauth2"/>
+        </operation>
+    </url>
+
+    <authentication location="header" name="Authorization" schema="commons.OAuth2Schema" scopes="TravelBureau.travelers.ALL" type="oauth2"/>
+</resource>

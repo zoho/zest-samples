@@ -1,0 +1,1727 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:element name="components">
+		<xs:annotation>
+			<xs:documentation>This element acts as a storage container for other elements that can be reused within a resource and across multiple resources. It reduces the recurrence of similar tags, optimising the long-winded files with conciser codes. All the child elements of components should have the ref-name attribute with unique value. Whenever you want to reuse that child element, enter the value of ref-name in the name attribute of corresponding ref element.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="components">
+					<xs:attribute name="product" type="name-string" use="required">
+						<xs:annotation>
+							<xs:documentation>Mention the name of the product that you choose in ZEST UI.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="version" type="version-string" use="required">
+						<xs:annotation>
+							<xs:documentation>Mention the version in which you want to refer the global components.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attributeGroup ref="spec-version" />
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:attributeGroup name="spec-version">
+		<xs:attribute name="specification" use="required">
+			<xs:annotation>
+				<xs:documentation>Mention the xsd version of ZEST Specification Format.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="1.0.0" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:attributeGroup>
+
+	<xs:complexType name="components">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="example">
+				<xs:annotation>
+					<xs:documentation>Give example contents for the request/response body in this element. This will be added to the <b>help documentation</b>.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="example">
+							<xs:attribute name="name" type="name-string" use="required">
+								<xs:annotation>
+									<xs:documentation>Give a name for the sample request/response of the API.</xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+
+			<xs:element name="structure" type="ref-structure">
+				<xs:annotation>
+					<xs:documentation>Give the structural information of the body of request / response / argument.</xs:documentation>
+				</xs:annotation>
+				<xs:unique name="unique-ref-structure-property-name">
+					<xs:selector xpath="property"></xs:selector>
+					<xs:field xpath="@name"></xs:field>
+				</xs:unique>
+				<xs:unique name="unique-ref-structure-property-name-regex">
+					<xs:selector xpath="property"></xs:selector>
+					<xs:field xpath="@name-regex"></xs:field>
+				</xs:unique>
+			</xs:element>
+
+			<xs:element name="content">
+				<xs:annotation>
+					<xs:documentation>Give details about the content of response/request-body/argument.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="content">
+							<xs:attribute name="name" type="name-string" use="required">
+								<xs:annotation>
+									<xs:documentation>Give a name for the content.</xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+
+			<xs:element ref="argument" />
+
+			<xs:element name="request-body">
+				<xs:annotation>
+					<xs:documentation>Mention the request-body details for your operation.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="request-body">
+							<xs:attribute name="name" type="name-string" use="required">
+								<xs:annotation>
+									<xs:documentation>Give a name for the request-body.</xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+
+			<xs:element name="response">
+				<xs:annotation>
+					<xs:documentation>Response tag defines the response related information for a particular API. Response can be of multiple encodings. This can be defined by providing another content tag with different encoding.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="response">
+							<xs:attribute name="name" type="name-string" use="required">
+								<xs:annotation>
+									<xs:documentation>State the name of the response.</xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+				<xs:unique name="unique-response-component-argument-name">
+					<xs:selector xpath="argument|argument-ref"></xs:selector>
+					<xs:field xpath="@name"></xs:field>
+				</xs:unique>
+			</xs:element>
+
+			<xs:element ref="server" />
+
+			<xs:element name="terms-of-service">
+				<xs:annotation>
+					<xs:documentation>Give the details of terms of service of the API as an <b>MD String</b>.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="name" type="name-string">
+								<xs:annotation>
+									<xs:documentation>Give a name for the terms of service.</xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+
+			<xs:element name="contact-details" type="contact-details">
+				<xs:annotation>
+					<xs:documentation>Provide the contact information for <b>help documentation</b> or reach out for assistance. This content will be added to the help documentation.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element ref="license-details" />
+
+			<xs:element ref="token" />
+
+			<xs:element ref="oauth2" />
+
+			<xs:element name="throttling">
+				<xs:annotation>
+					<xs:documentation>You can specify the number of possible requests for the specified duration for a particular operation.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="throttling">
+							<xs:attribute name="name" type="name-string" use="required">
+								<xs:annotation>
+									<xs:documentation>Name of throttling.</xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+
+			<xs:element ref="tag" />
+			
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:attribute name="visibility" type="visibility" default="public">
+		<xs:annotation>
+			<xs:documentation>Specify the visibility. The possible values are internal, private, public.</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:element name="description" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Give information about the element. This description will be added to the help document. This element type is <b>String(MD)</b></xs:documentation>
+		</xs:annotation>
+	</xs:element>
+
+	<xs:simpleType name="any-string">
+		<xs:restriction base="xs:string">
+			<xs:pattern value=".*[^\s].*"/>
+			<xs:maxLength value="255" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="name-string">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[^.]+" />
+			<xs:maxLength value="255" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="ref-name-string">
+		<xs:restriction base="xs:string">
+			<!-- Resource name max (200) + dot + Component name max (255) -->
+			<xs:maxLength value="456" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="resource-string">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[a-zA-Z][a-zA-Z0-9_-]*" />
+			<xs:maxLength value="200" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="version-string">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="(0|[1-9]\d{0,8})(\.(0|[1-9]\d{0,8})){0,2}" />
+			<xs:maxLength value="60" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="tag">
+		<xs:annotation>
+			<xs:documentation>In API help documentation, multiple operations can be grouped under a single tag name, based on the details you mention in this element.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="description" minOccurs="0" />
+			</xs:sequence>
+			<xs:attribute name="name" type="name-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Mention the name of the tag to be used in the help document.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute ref="visibility" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="tag-ref">
+		<xs:annotation>
+			<xs:documentation>Refer tag from local components / other resources / global component.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="name" type="ref-name-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Provide the name of the tag specifiecd in the components.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="url">
+		<xs:annotation>
+			<xs:documentation>Give the <b>endpoint details</b> along with the <b>possible operations</b> in this element.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="operation" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Define the <b>possible operations</b> of the API for a particular <b>URL</b>.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element ref="deprecate" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Provide the <b>deprecation details</b> (i.e., the outdated or no longer supported information) of the API.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="description" minOccurs="0" />
+						<xs:choice minOccurs="0" maxOccurs="unbounded">
+							<xs:element name="throttling" type="throttling">
+								<xs:annotation>
+									<xs:documentation>You can specify the number of possible requests for the specified duration for a particular operation.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element ref="throttling-ref" />
+						</xs:choice>
+						<xs:element name="external-document" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Mention the links to external documents that needs to be added to the help document.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element ref="description" minOccurs="0" />
+								</xs:sequence>
+								<xs:attribute name="url" type="xs:anyURI" use="required">
+									<xs:annotation>
+										<xs:documentation>Mention the external URL to be added to the help document.</xs:documentation>
+									</xs:annotation>
+								</xs:attribute>
+							</xs:complexType>
+						</xs:element>
+						<xs:choice minOccurs="0" maxOccurs="unbounded">
+							<xs:element ref="tag">
+								<xs:annotation>
+									<xs:documentation>In API help documentation, multiple operations can be grouped under a single tag name, based on the details you mention in this element.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element ref="tag-ref" />
+						</xs:choice>
+						<xs:element ref="error" minOccurs="0" />
+						<xs:choice minOccurs="0" maxOccurs="unbounded">
+							<xs:element ref="argument" />
+							<xs:element ref="argument-ref" />
+						</xs:choice>
+						<xs:choice minOccurs="0" maxOccurs="unbounded">
+							<xs:element name="request-body" type="request-body">
+								<xs:annotation>
+									<xs:documentation>Mention the request-body details for your operation.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element ref="request-body-ref" />
+						</xs:choice>
+						<xs:choice maxOccurs="unbounded">
+							<xs:element name="response">
+								<xs:annotation>
+									<xs:documentation>Response tag defines the response related information for a particular API. Response can be of multiple encodings. This can be defined by providing another content tag with different encoding.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:complexContent>
+										<xs:extension base="response">
+											<xs:attribute name="name" type="name-string">
+												<xs:annotation>
+													<xs:documentation>State the name of the response.</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+										</xs:extension>
+									</xs:complexContent>
+								</xs:complexType>
+								<xs:unique name="unique-response-argument-name">
+									<xs:selector xpath="argument|argument-ref"></xs:selector>
+									<xs:field xpath="@name"></xs:field>
+								</xs:unique>
+							</xs:element>
+							<xs:element ref="response-ref" />
+						</xs:choice>
+						<xs:element ref="authentication" minOccurs="0" maxOccurs="unbounded" />
+					</xs:sequence>
+					<xs:attribute name="method" use="required">
+						<xs:annotation>
+							<xs:documentation>Select the HTTP method that is applicable for the API operation. The http methods are <b>get, post, put, patch and delete</b>.</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="get" />
+								<xs:enumeration value="post" />
+								<xs:enumeration value="put" />
+								<xs:enumeration value="patch" />
+								<xs:enumeration value="delete" />
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+					<xs:attribute name="name" type="name-string" use="required">
+						<xs:annotation>
+							<xs:documentation>Give a name for the operation and it should be unique in that ZSPEC file/Resource.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="category" use="required">
+						<xs:annotation>
+							<xs:documentation>Defines the category of the operation. It'll be used while testing the API to find URLs based on the category. The possible values are <b>read, create, update, delete and action</b>.</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="read" />
+								<xs:enumeration value="create" />
+								<xs:enumeration value="update" />
+								<xs:enumeration value="delete" />
+								<xs:enumeration value="action" />
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+					<xs:attribute name="delay" type="xs:long">
+						<xs:annotation>
+							<xs:documentation>Mention the time gap required for the current operator.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="validation-delay" type="xs:long">
+						<xs:annotation>
+							<xs:documentation>Mention the waiting time for the <b>call back requests</b>. For instance, consider you want to create a record and get details of the newly created record. Say your validation delay is 10s. Once the response for record creation is received, the GET Record call will be fired only after of 10 seconds. This will be used in the API Automation.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute ref="visibility" />
+					<xs:anyAttribute processContents="lax" />
+				</xs:complexType>
+				
+				<xs:unique name="unique-tag">
+					<xs:selector xpath="tag|tag-ref"></xs:selector>
+					<xs:field xpath="@name"></xs:field>
+				</xs:unique>
+				<xs:unique name="unique-argument">
+					<xs:selector xpath="argument|argument-ref"></xs:selector>
+					<xs:field xpath="@name"></xs:field>
+				</xs:unique>
+				<xs:unique name="unique-throttling-ref">
+					<xs:selector xpath="throttling-ref"></xs:selector>
+					<xs:field xpath="@name"></xs:field>
+				</xs:unique>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="path" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Give the URL path.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:anyAttribute processContents="lax" />
+	</xs:complexType>
+
+	<xs:element name="path-config">
+		<xs:annotation>
+			<xs:documentation>Provide the path details from where the <b>data</b> and <b>primary keys</b> of the resource should be fetched.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="primary" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Using this tag , you can mention the path of the primary key relative to the path mentioned in the path-config.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="name" type="name-string">
+							<xs:annotation>
+								<xs:documentation>Give a name for the primary.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="path" type="xs:string" use="required">
+							<xs:annotation>
+								<xs:documentation>Mention the path of the primary key relative to the path mentioned in the path-config.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="data-extraction-path" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Mention the JSON path to locate the root key.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="server">
+		<xs:annotation>
+			<xs:documentation>Give the <b>details of the domains</b> and DCs through which you can access the API.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="description" minOccurs="0" />
+				<xs:element name="variable" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>When you want to add multiple domains to the Server element, you can use a variable and provide the list of possible values.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="description" minOccurs="0" />
+						</xs:sequence>
+						<xs:attribute name="name" type="name-string" use="required">
+							<xs:annotation>
+								<xs:documentation>Give a name for the variable.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="values" type="xs:string" use="required">
+							<xs:annotation>
+								<xs:documentation>Specify the possible values of variable.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="environment" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Mention the <b>environment details of the server</b> in this element.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="description" minOccurs="0" />
+						</xs:sequence>
+						<xs:attribute name="type" use="required">
+							<xs:annotation>
+								<xs:documentation>Mention the environment using which the user can access the API.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="development" />
+									<xs:enumeration value="sandbox" />
+									<xs:enumeration value="production" />
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="location">
+							<xs:annotation>
+								<xs:documentation>Mention the location of arguments.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="param" />
+									<xs:enumeration value="header" />
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="name" type="name-string">
+							<xs:annotation>
+								<xs:documentation>Specify a name for the header or the param.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="value" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Specify the value of the header/param.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+
+			<xs:attribute name="name" type="name-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Specify a name for the server.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="dc" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Mention the name of the data centre.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="url" type="xs:anyURI" use="required">
+				<xs:annotation>
+					<xs:documentation>Mention the domain url.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute ref="visibility" />
+		</xs:complexType>
+		<xs:unique name="unique-environment-type">
+			<xs:selector xpath="environment"></xs:selector>
+			<xs:field xpath="@type"></xs:field>
+		</xs:unique>
+		<xs:unique name="unique-variable-name">
+			<xs:selector xpath="variable"></xs:selector>
+			<xs:field xpath="@name"></xs:field>
+		</xs:unique>
+	</xs:element>
+
+	<xs:element name="server-ref">
+		<xs:annotation>
+			<xs:documentation>Refer tag from local components / other resources / global component.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Provide the name of the tag specifiecd in the components.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="contact-details">
+		<xs:attribute name="name" type="name-string" use="required">
+			<xs:annotation>
+				<xs:documentation>Give the name of the organisation or team or contact person which handles the support to add to the help document.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="email" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Give the e-mail ID of the support team to add to the help document.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="url" type="xs:anyURI">
+			<xs:annotation>
+				<xs:documentation>Give the website links of the organisation to list in the help document.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute ref="visibility" />
+	</xs:complexType>
+
+	<xs:element name="contact-details-ref">
+		<xs:annotation>
+			<xs:documentation>Refer contact-details from local components / other resources / global component.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Provide the name of the contact-details specifiecd in the components.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="terms-of-service-ref">
+		<xs:annotation>
+			<xs:documentation>Refer terms-of-service from local components / other resources / global component.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Provide the name of the terms-of-service specifiecd in the components.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="license-details">
+		<xs:annotation>
+			<xs:documentation>Furnish the relevant information regarding the license associated with the API.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="name" type="name-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Mention the name of the license.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="url" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Mention the url of the license.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="license-details-ref">
+		<xs:annotation>
+			<xs:documentation>Refer license-details from local components / other resources / global component.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Provide the name of the license-details specifiecd in the components.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="throttling">
+		<xs:attribute name="threshold" type="xs:positiveInteger" use="required">
+			<xs:annotation>
+				<xs:documentation>Give the maximum number of allowed requests for the specified duration.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="duration" use="required">
+			<xs:annotation>
+				<xs:documentation>Give the time period (milliseconds) for which you allow the user to make the maximum number of calls(threshold). Range 1 minute to 29 days.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:unsignedLong">
+					<xs:minInclusive value="60000"/>
+      				<xs:maxInclusive value="2505600000"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="lock-period" type="xs:integer">
+			<xs:annotation>
+				<xs:documentation>Mention the time period for which the operation should be locked if the user exceeds the threshold within the given duration.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="type" use="required">
+			<xs:annotation>
+				<xs:documentation>It states whether the throttling is applicable in the organization or the IP level. The possible values are global and ip. The 'global' will make the throttling applicable at the organization level. Whereas, 'ip' will make the throttling applicable for each and every IP addresses used to fire API calls.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="global" />
+					<xs:enumeration value="ip" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:element name="throttling-ref">
+		<xs:annotation>
+			<xs:documentation>Refer throttling from local components / other resources / global component.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="name" type="ref-name-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Provide the name of the throttling specifiecd in the components.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="token">
+		<xs:annotation>
+			<xs:documentation>Mention the <b>details related to token flow</b> for authorizing your API.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="description" minOccurs="0" />
+				<xs:element name="token-url" type="url">
+					<xs:annotation>
+						<xs:documentation>Give the details of URL and possible operations in this element.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="authentication-url" type="url" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Give the details of URL and possible operations in this element.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="name" use="required" type="name-string">
+				<xs:annotation>
+					<xs:documentation>Give a name to the token flow here.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute ref="visibility" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="token-ref">
+		<xs:annotation>
+			<xs:documentation>Refer token from local components / other resources / global component.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="name" type="ref-name-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Provide the name of the token specifiecd in the components.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="oauth2">
+		<xs:annotation>
+			<xs:documentation>Mention the <b>details related to OAuth2 flow</b> for authorizing your API.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="description" minOccurs="0" />
+				<xs:element name="authorization-url" type="url">
+					<xs:annotation>
+						<xs:documentation>Give the details of URL and possible operations in this element.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="token-url" type="url">
+					<xs:annotation>
+						<xs:documentation>Give the details of URL and possible operations in this element.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="refresh-url" type="url">
+					<xs:annotation>
+						<xs:documentation>Give the details of URL and possible operations in this element.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="authentication-url" type="url" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Give the details of URL and possible operations in this element.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="name" use="required" type="name-string">
+				<xs:annotation>
+					<xs:documentation>You can give a name to the OAuth2 flow here.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute ref="visibility" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="oauth2-ref">
+		<xs:annotation>
+			<xs:documentation>Refer oauth2 from local components / other resources / global component.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="name" type="ref-name-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Provide the name of the oauth2 specifiecd in the components.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:attributeGroup name="structure-attributes">
+		<xs:attribute name="name" type="name-string">
+			<xs:annotation>
+				<xs:documentation>Give a name for the structure. Refer the note below.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute ref="visibility" />
+		<xs:attribute name="discriminator-value" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Give the value of the discriminator mapping for which this structure should be picked.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="extend" type="ref-name-string">
+			<xs:annotation>
+				<xs:documentation>Specify the name of the structure which you are trying to extend.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="cases" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>For Automation, to validate that a particular test case returns a specific structure, we recommend you to add the case name.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="lookup" type="resource-string">
+			<xs:annotation>
+				<xs:documentation></xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:anyAttribute processContents="lax" />
+	</xs:attributeGroup>
+
+	<xs:complexType name="ref-structure">
+		<xs:complexContent>
+			<xs:extension base="primary-structure">
+				<xs:attribute name="ref-name" type="name-string" use="required">
+					<xs:annotation>
+						<xs:documentation>Give a unique value to refer the current structure in some other part of the same or different ZSPEC files.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:element name="structure" type="primary-structure">
+		<xs:annotation>
+			<xs:documentation>Give the structural information of the body of request / response / argument.</xs:documentation>
+		</xs:annotation>
+		<xs:unique name="unique-structure-property-name">
+			<xs:selector xpath="property"></xs:selector>
+			<xs:field xpath="@name"></xs:field>
+		</xs:unique>
+		<xs:unique name="unique-structure-property-name-regex">
+			<xs:selector xpath="property"></xs:selector>
+			<xs:field xpath="@name-regex"></xs:field>
+		</xs:unique>
+	</xs:element>
+
+	<xs:complexType name="primary-structure">
+		<xs:sequence>
+			<xs:element ref="deprecate" minOccurs="0" />
+			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Mention the properties of the argument, request and response structures here along with its details.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="extra-property" type="extra-property" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>An extra property behaves the same as a usual property except for the name which has to match the regex pattern provided in the name-regex attribute.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attributeGroup ref="structure-attributes" />
+	</xs:complexType>
+
+	<xs:element name="structure-ref">
+		<xs:annotation>
+			<xs:documentation>Refer structure from local components / other resources / global component.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="name" type="ref-name-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Provide the name of the structure specifiecd in the components.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="discriminator">
+		<xs:annotation>
+			<xs:documentation>When you want to pick a structure based on the value of a particular property, give the name of that property and mapping details in this element.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="mapping" />
+			</xs:choice>
+			<xs:attribute name="property-name" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Mention the name of the discriminator property.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+		<xs:unique name="unique-value">
+			<xs:selector xpath="mapping"></xs:selector>
+			<xs:field xpath="@value"></xs:field>
+		</xs:unique>
+		<xs:unique name="unique-structure-ref-name">
+			<xs:selector xpath="mapping"></xs:selector>
+			<xs:field xpath="@structure-ref"></xs:field>
+		</xs:unique>
+	</xs:element>
+
+	<xs:element name="mapping">
+		<xs:annotation>
+			<xs:documentation>To map a structure based on the value of a particular property (that you mention in property-name of discriminator).</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="value" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Give the value of the discriminator property based on which you want to map the structure.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="structure-ref" type="ref-name-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Ref name of the structure that you want to map.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="structure-group">
+		<xs:annotation>
+			<xs:documentation>You can group multiple structures inside a structure group.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:choice maxOccurs="unbounded">
+					<xs:element ref="structure" />
+					<xs:element ref="structure-ref" />
+				</xs:choice>
+				<xs:element ref="discriminator" minOccurs="0" />
+			</xs:sequence>
+			<xs:attribute name="name" type="name-string">
+				<xs:annotation>
+					<xs:documentation>If you add a name here then it is <b>mandatory</b> to add names to all the child structures.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="type" use="required">
+				<xs:annotation>
+					<xs:documentation>State how do you want to pick the structure for your case. The possible values are <b>one-of, any-of, all-of, array-of</b>.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="any-of" />
+						<xs:enumeration value="one-of" />
+						<xs:enumeration value="all-of" />
+						<xs:enumeration value="array-of" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:anyAttribute processContents="lax" />
+		</xs:complexType>
+		<xs:unique name="unique-structure-ref">
+			<xs:selector xpath="structure-ref"></xs:selector>
+			<xs:field xpath="@name"></xs:field>
+		</xs:unique>
+	</xs:element>
+
+	<xs:element name="deprecate">
+		<xs:annotation>
+			<xs:documentation>Provide the <b>deprecation details</b> (i.e., the outdated or no longer supported information) of the API.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="description" minOccurs="0" />
+			</xs:sequence>
+			<xs:attribute name="alternate" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Give the <b>replacement url</b> related to the deprecated API operation. This will be added to the help document.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="since" type="version-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Provide the version number that corresponds to the <b>deprecated version</b>.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="for-removal" type="xs:boolean" default="false">
+				<xs:annotation>
+					<xs:documentation>Indicate whether deprecation will occur in the next immediate version by specifying <b>true</b>. Otherwise, if deprecation is not planned for the next version, please specify <b>false</b>.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="min-max">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\d+|\d+,(-1|\d+)" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="visibility">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="internal" />
+			<xs:enumeration value="private" />
+			<xs:enumeration value="public" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="extra-property">
+		<xs:complexContent>
+			<xs:extension base="generic-property">
+				<xs:attribute name="name-regex" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Mention the regex pattern to which the name of the property should match.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="property">
+		<xs:complexContent>
+			<xs:extension base="generic-property">
+				<xs:attribute name="name" type="any-string">
+					<xs:annotation>
+						<xs:documentation>
+							Mention the name of the property. This name is
+							<b>mandatory</b>
+							if you add more than one property to a structure.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="simple-property">
+		<xs:group ref="simple-property-group" />
+		<xs:attribute name="type" type="property-type">
+			<xs:annotation>
+				<xs:documentation>Specify the data type of the property.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attributeGroup ref="simple-property-attributes" />
+	</xs:complexType>
+
+	<xs:complexType name="generic-property">
+		<xs:choice>
+			<xs:group ref="simple-property-group" />
+			<xs:element name="extend-property" type="simple-property" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>The extend-property allows you to override or switch to different attribute values with respect to the parent property attributes.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+		<xs:attribute name="type" type="property-type" use="required">
+			<xs:annotation>
+				<xs:documentation>Specify the data type of the property.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attributeGroup ref="simple-property-attributes" />
+	</xs:complexType>
+
+	<xs:simpleType name="property-type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="object" />
+
+			<xs:enumeration value="string" />
+
+			<xs:enumeration value="integer" />
+			<xs:enumeration value="long_string" />
+			<xs:enumeration value="long" />
+			<xs:enumeration value="float" />
+			<xs:enumeration value="double" />
+			<xs:enumeration value="serial" />
+
+			<xs:enumeration value="boolean" />
+
+			<xs:enumeration value="date" />
+			<xs:enumeration value="time" />
+			<xs:enumeration value="datetime" />
+			<xs:enumeration value="timezone" />
+
+			<xs:enumeration value="collections" />
+			<xs:enumeration value="array" />
+			<xs:enumeration value="map" />
+
+			<xs:enumeration value="password" />
+			<xs:enumeration value="byte" />
+			<xs:enumeration value="binary" />
+			<xs:enumeration value="file" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:group name="simple-property-group">
+		<xs:sequence>
+			<xs:element ref="deprecate" minOccurs="0" />
+			<xs:element ref="description" minOccurs="0" />
+			<xs:element name="xml-format" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Mention the changes you want in the xml representation of a property like which is the attribute and which is the child element, prefix to be added and wrapper element details.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="name" type="any-string">
+						<xs:annotation>
+							<xs:documentation>Mention the name you want, when the property gets changes to an xml.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="namespace" type="xs:anyURI">
+						<xs:annotation>
+							<xs:documentation>Mention the namespace required to be added for the xml.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="prefix" type="name-string">
+						<xs:annotation>
+							<xs:documentation>Mention the prefix you want to add to the xml tags.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="attribute" type="xs:boolean" default="false">
+						<xs:annotation>
+							<xs:documentation>Mention true if you want to make the property as an attribute. If this is false then the property will be treated as child element. By default this will be considered as false.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="wrapped" type="xs:boolean" default="false">
+						<xs:annotation>
+							<xs:documentation>Mention if the wrapper element for the xml is required or not. By default this will be considered as false.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+			<xs:element ref="file-meta" minOccurs="0" />
+			<xs:choice minOccurs="0">
+				<xs:element name="ordered-structures">
+					<xs:annotation>
+						<xs:documentation>If you want the structures to be present at specific indices, you can specify the structures in the exact order required using this tag.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:choice maxOccurs="unbounded">
+							<xs:element ref="structure" />
+							<xs:element ref="structure-ref" />
+						</xs:choice>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:choice minOccurs="0">
+				<xs:element ref="structure" />
+				<xs:element ref="structure-ref" />
+				<xs:element ref="structure-group" />
+				<xs:element ref="composite-structure-groups" />
+			</xs:choice>
+		</xs:sequence>
+	</xs:group>
+
+	<xs:element name="composite-structure-groups">
+		<xs:annotation>
+			<xs:documentation>Whenever you want to combine multiple structure groups from the same or other resources and use it for your current resource, mention the structure group details in this element.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="structure-group" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:attributeGroup name="simple-property-attributes">
+		<xs:attribute ref="visibility" />
+		<xs:attribute name="values" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Give the possible values for the property.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="example-value" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Specify an example content for the property that must be published in the API help documentation. If an example is already given in the content, then that example will be published in the help document. Otherwise all example-values of different properties will be grouped together and added to the help document.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="default-value" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Specify a default value for the property.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="regex" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Mention the regex pattern to which the property value should match.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="length" type="min-max">
+			<xs:annotation>
+				<xs:documentation>Specify the value's minimum and maximum length/size based on the type of the property.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="path" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Specify the path from which data must be fetched.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="required-for" type="constraint-scope" default="none">
+			<xs:annotation>
+				<xs:documentation>Specify whether the property key has to appear in the desired location. The possible values are <b>none, all, request, response</b>.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="nullable-for" type="constraint-scope" default="none">
+			<xs:annotation>
+				<xs:documentation>Specify whether the property can be null or not in the desired location. The possible values are <b>none, all, request, response</b>.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="unique-for" type="constraint-scope" default="none">
+			<xs:annotation>
+				<xs:documentation>Specify whether the property should be unique or not in the desired location. The possible values are <b>none, all, request, response</b>.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="emptiable-for" type="constraint-scope" default="none">
+			<xs:annotation>
+				<xs:documentation>Specify whether the property can be empty or not in the desired location. The possible values are <b>none, all, request, response</b>.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="condition-for-all" type="xs:string" />
+		<xs:attribute name="condition-for-request" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>During Automation, while generating the test-cases, if you want to specify a condition based on which the request body should be constructed, you can mention that criteria here.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="condition-for-response" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>During validation of response, when you want the response to match a particular criteria, mention that here.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="value-condition" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>The property value must meet the specified condition.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="include-for" default="Request[*], Response[*]" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>State whether a property should be included or excluded in an operation. The format for this is <b>Request[list of categories(csv)], Response[list of categories(csv)]</b>.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="range">
+			<xs:annotation>
+				<xs:documentation>If you want to specify the range of values for your property, mention that here. For example range="0,99999" for Integer type and range="A-Z" for string.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="-?\d+,\d+" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="format" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>For <b>Date</b> and <b>Date Time</b> properties, you can mention the required format in this attribute. The default value is "yyyy-MM-ddTHH:mm:ss+/-hh:mm".</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="decimal-place" type="xs:integer">
+			<xs:annotation>
+				<xs:documentation>Specify the number of decimal places allowed. This is applicable when the property is of type double. If decimal-place="2" , will allow 2 digits after the decimal point.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="extra-value" default="deny">
+			<xs:annotation>
+				<xs:documentation>You can specify how the property should behave when there is a new valid value which is not part of the possible values list.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="allow" />
+					<xs:enumeration value="deny" />
+					<xs:enumeration value="map-default" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="invalid-value" default="deny">
+			<xs:annotation>
+				<xs:documentation>You can specify how the property should behave when there is an invalid value (a value that does not satisfy the criteria attributes of property).</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="deny" />
+					<xs:enumeration value="map-default" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:anyAttribute processContents="lax" />
+	</xs:attributeGroup>
+
+	<xs:simpleType name="constraint-scope">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="none" />
+			<xs:enumeration value="all" />
+			<xs:enumeration value="request" />
+			<xs:enumeration value="response" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="error">
+		<xs:annotation>
+			<xs:documentation>Provide the criteria utilized to determine whether a response should be classified as a success or an error. This is for automation.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="condition" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Mention the condition to decide whether the response is success or an error.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="content" type="content">
+		<xs:annotation>
+			<xs:documentation>Give details about the content of response/request-body/argument.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+
+	<xs:complexType name="content">
+		<xs:sequence>
+			<xs:element name="encode">
+				<xs:annotation>
+					<xs:documentation>Mention the content type.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="type" use="required" type="any-string">
+						<xs:annotation>
+							<xs:documentation>Specify the type of content. For example - application/json, application/xml, text/plain, application/zip.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+			<xs:element ref="error" minOccurs="0" />
+			<xs:element ref="path-config" minOccurs="0" />
+			<xs:choice>
+				<xs:element ref="structure" />
+				<xs:element ref="structure-ref" />
+				<xs:element name="stream">
+					<xs:annotation>
+						<xs:documentation>Whenever the request or the response has a file as bytes in raw form, you can give details about the file using this tag.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="size" type="min-max">
+							<xs:annotation>
+								<xs:documentation>Specify the maximum size of the stream in bytes ( size=100") or you can mention the minimum and maximum possible size of the stream separated by comma (size="0,100")</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element ref="structure-group" />
+				<xs:element ref="composite-structure-groups" />
+			</xs:choice>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="example">
+					<xs:annotation>
+						<xs:documentation>Give example contents for the request/response body in this element. This will be added to the <b>help documentation</b>.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:complexContent>
+							<xs:extension base="example">
+								<xs:attribute name="name" type="name-string">
+									<xs:annotation>
+										<xs:documentation>Give a name for the sample request/response of the API.</xs:documentation>
+									</xs:annotation>
+								</xs:attribute>
+							</xs:extension>
+						</xs:complexContent>
+					</xs:complexType>
+				</xs:element>
+				<xs:element ref="example-ref" />
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute ref="visibility" />
+	</xs:complexType>
+
+	<xs:element name="file-meta">
+		<xs:annotation>
+			<xs:documentation>Mention the details of the files which are part of the request or reponse of an API.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="extension" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Mention the details of the extension of the file that the user uploads.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="name" type="name-string" use="required">
+							<xs:annotation>
+								<xs:documentation>You can mention the file extension here. For example txt, csv.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="size" type="min-max">
+							<xs:annotation>
+								<xs:documentation>Mention the size of the file in bytes. If you mention a single value it will be considered as maximum size. You can also mention the minimum and maximum size by sperating the values with a comma i.e., <b>lenghth - 10,50</b>.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="length" type="min-max">
+							<xs:annotation>
+								<xs:documentation>Here you can mention the number of files that can be uploaded. If you mention a single value it will be considered as maximum number of files that can be uploaded. You can also mention the minimum and maximum count of files that can be uploaded by sperating the values with a comma.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="file-name">
+					<xs:annotation>
+						<xs:documentation>Mention the validations you want for the file name.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="regex" type="xs:string" use="required">
+							<xs:annotation>
+								<xs:documentation>Mention the regex pattern of the file name here.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="length" type="min-max">
+							<xs:annotation>
+								<xs:documentation>You can specify the minimum and maximum possible length of the file name or you can just mention the maximum possible file name length.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="disallowed-extensions" type="any-string">
+				<xs:annotation>
+					<xs:documentation>Mention the file extensions that you don't want to allow.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="content-types" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>You can mention the possible content types of the file here.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="size" type="min-max">
+				<xs:annotation>
+					<xs:documentation>Specify the maximum size of the file in bytes ( size="100") or you can mention the minimum and maximum possible size of the file separated by comma (size="0,100").</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="overall-size" type="min-max">
+				<xs:annotation>
+					<xs:documentation></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="import-url" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>You should denote true whenever the file should be read using url. You can mention this only for requests.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="continue-on-error" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>When there are a number of files and any one of the files is not as per the expectations configured, mention true to continue validation for other files, otherwise mention as false.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="content-ref">
+		<xs:annotation>
+			<xs:documentation>Refer content from local components / other resources / global component.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="name" type="ref-name-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Provide the name of the content specifiecd in the components.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="example">
+		<xs:sequence>
+			<xs:element ref="description" minOccurs="0" />
+			<xs:element name="value" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Give the actual example of request or response in this element.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="example-ref">
+		<xs:annotation>
+			<xs:documentation>Refer example from local components / other resources / global component.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="name" type="ref-name-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Provide the name of the example specifiecd in the components.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="argument">
+		<xs:annotation>
+			<xs:documentation>Give the details of parameter, header and variables of the resource in this element.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="deprecate" minOccurs="0" />
+				<xs:element ref="description" minOccurs="0" />
+				<xs:choice maxOccurs="unbounded">
+					<xs:element ref="content" />
+					<xs:element ref="content-ref" />
+				</xs:choice>
+			</xs:sequence>
+			<xs:attribute ref="visibility" />
+			<xs:attribute name="required" type="xs:boolean" default="false">
+				<xs:annotation>
+					<xs:documentation>Specify the requirement status of an argument in your API, indicating whether it is mandatory or not.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="name" type="name-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Give a name for the argument.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="length" type="min-max">
+				<xs:annotation>
+					<xs:documentation>Specify the maximum number of values for the argument. You can also specify the minimum and maximum number of values separated by a comma.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="location" use="required">
+				<xs:annotation>
+					<xs:documentation>Specify the location of the argument for your API.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="param" />
+						<xs:enumeration value="header" />
+						<xs:enumeration value="variable" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="delimiter" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Specify the delimiter for multiple values in your API.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="style">
+				<xs:annotation>
+					<xs:documentation>Specify which approach ZEST should use to separate the list of arguments. It can be either standrard or using delimiters.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="delimiter" />
+						<xs:enumeration value="standard" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="condition" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Specify the condition which needs to be true in order to accept the arguments.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="concurrent" type="name-string">
+				<xs:annotation>
+					<xs:documentation>Give the name of argument which you want to allow simultaneously.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="non-concurrent" type="name-string">
+				<xs:annotation>
+					<xs:documentation>Give the name of the argument that should not be present simultaneously.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:anyAttribute processContents="lax" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="argument-ref">
+		<xs:annotation>
+			<xs:documentation>Refer argument from local components / other resources / global component.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="name" type="ref-name-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Provide the name of the argument specifiecd in the components.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="request-body">
+		<xs:sequence>
+			<xs:element ref="description" minOccurs="0" />
+			<xs:choice maxOccurs="unbounded">
+				<xs:element ref="content" />
+				<xs:element ref="content-ref" />
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="wrapped" type="xs:boolean" />
+	</xs:complexType>
+
+	<xs:element name="request-body-ref">
+		<xs:annotation>
+			<xs:documentation>Refer request-body from local components / other resources / global component.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="name" type="ref-name-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Provide the name of the request-body specifiecd in the components.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="response">
+		<xs:sequence>
+			<xs:element ref="description" minOccurs="0" />
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="content" />
+				<xs:element ref="content-ref" />
+			</xs:choice>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="argument" />
+				<xs:element ref="argument-ref" />
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute ref="visibility" />
+		<xs:attribute name="status" use="required">
+			<xs:annotation>
+				<xs:documentation>Defines the status codes of the response. It'll accept only the valid status codes. Use this attribute to specify the status codes of your API response.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:enumeration value="100" />
+					<xs:enumeration value="101" />
+					<xs:enumeration value="102" />
+					<xs:enumeration value="194" />
+					<xs:enumeration value="195" />
+					<xs:enumeration value="199" />
+					<xs:enumeration value="200" />
+					<xs:enumeration value="201" />
+					<xs:enumeration value="202" />
+					<xs:enumeration value="203" />
+					<xs:enumeration value="204" />
+					<xs:enumeration value="205" />
+					<xs:enumeration value="206" />
+					<xs:enumeration value="207" />
+					<xs:enumeration value="208" />
+					<xs:enumeration value="226" />
+					<xs:enumeration value="232" />
+					<xs:enumeration value="300" />
+					<xs:enumeration value="301" />
+					<xs:enumeration value="302" />
+					<xs:enumeration value="303" />
+					<xs:enumeration value="304" />
+					<xs:enumeration value="305" />
+					<xs:enumeration value="306" />
+					<xs:enumeration value="307" />
+					<xs:enumeration value="308" />
+					<xs:enumeration value="400" />
+					<xs:enumeration value="401" />
+					<xs:enumeration value="402" />
+					<xs:enumeration value="403" />
+					<xs:enumeration value="404" />
+					<xs:enumeration value="405" />
+					<xs:enumeration value="406" />
+					<xs:enumeration value="407" />
+					<xs:enumeration value="408" />
+					<xs:enumeration value="409" />
+					<xs:enumeration value="410" />
+					<xs:enumeration value="411" />
+					<xs:enumeration value="412" />
+					<xs:enumeration value="413" />
+					<xs:enumeration value="414" />
+					<xs:enumeration value="415" />
+					<xs:enumeration value="416" />
+					<xs:enumeration value="417" />
+					<xs:enumeration value="418" />
+					<xs:enumeration value="420" />
+					<xs:enumeration value="422" />
+					<xs:enumeration value="423" />
+					<xs:enumeration value="424" />
+					<xs:enumeration value="425" />
+					<xs:enumeration value="426" />
+					<xs:enumeration value="428" />
+					<xs:enumeration value="429" />
+					<xs:enumeration value="431" />
+					<xs:enumeration value="443" />
+					<xs:enumeration value="444" />
+					<xs:enumeration value="449" />
+					<xs:enumeration value="450" />
+					<xs:enumeration value="451" />
+					<xs:enumeration value="499" />
+					<xs:enumeration value="500" />
+					<xs:enumeration value="501" />
+					<xs:enumeration value="502" />
+					<xs:enumeration value="503" />
+					<xs:enumeration value="504" />
+					<xs:enumeration value="505" />
+					<xs:enumeration value="506" />
+					<xs:enumeration value="507" />
+					<xs:enumeration value="508" />
+					<xs:enumeration value="509" />
+					<xs:enumeration value="510" />
+					<xs:enumeration value="511" />
+					<xs:enumeration value="598" />
+					<xs:enumeration value="599" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="unexpected-error" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>Specify this attribute when you are writing the response element for unhandled errors i.e., internal server error.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:element name="response-ref">
+		<xs:annotation>
+			<xs:documentation>Refer response from local components / other resources / global component.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="name" type="ref-name-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Provide the name of the response specifiecd in the components.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="authentication">
+		<xs:annotation>
+			<xs:documentation>Give details related to the authentication of an operation or resource.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="type" use="required">
+				<xs:annotation>
+					<xs:documentation>Give the type of the authentication.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="oauth2" />
+						<xs:enumeration value="token" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="scopes" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Mention the scope for the API.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="name" type="name-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Give a name for the authentication key.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="location" use="required">
+				<xs:annotation>
+					<xs:documentation>Mention the location where the authentication key must be kept.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="param" />
+						<xs:enumeration value="header" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="schema" type="ref-name-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Mention the name of the oauth or the token used in the authentication schema.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

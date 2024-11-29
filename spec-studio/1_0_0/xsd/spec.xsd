@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:include schemaLocation="components.xsd" />
+	<xs:element name="resource">
+		<xs:annotation>
+			<xs:documentation>This acts as the root element of the ZSPEC XML file.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="components" minOccurs="0" type="components">
+					<xs:annotation>
+						<xs:documentation>This element acts as a <b>storage container for other elements that can be reused</b> within a resource and <b>across multiple resources</b>. It reduces the recurrence of similar tags, optimising the long-winded files with conciser codes. All the child elements of components should have the <b>ref-name</b> attribute with <b>unique value</b>. Whenever you want to reuse that child element, enter the value of <b>ref-name</b> in the <b>name</b> attribute of corresponding ref element.</xs:documentation>
+					</xs:annotation>
+					<xs:unique name="unique-example-name">
+						<xs:selector xpath="example"></xs:selector>
+						<xs:field xpath="@name"></xs:field>
+					</xs:unique>
+					<xs:unique name="unique-structure-name">
+						<xs:selector xpath="structure"></xs:selector>
+						<xs:field xpath="@ref-name"></xs:field>
+					</xs:unique>
+					<xs:unique name="unique-content-name">
+						<xs:selector xpath="content"></xs:selector>
+						<xs:field xpath="@name"></xs:field>
+					</xs:unique>
+					<xs:unique name="unique-argument-name">
+						<xs:selector xpath="argument"></xs:selector>
+						<xs:field xpath="@name"></xs:field>
+					</xs:unique>
+					<xs:unique name="unique-request-body-name">
+						<xs:selector xpath="request-body"></xs:selector>
+						<xs:field xpath="@name"></xs:field>
+					</xs:unique>
+					<xs:unique name="unique-response-name">
+						<xs:selector xpath="response"></xs:selector>
+						<xs:field xpath="@name"></xs:field>
+					</xs:unique>
+					<xs:unique name="unique-server-name">
+						<xs:selector xpath="server"></xs:selector>
+						<xs:field xpath="@name"></xs:field>
+					</xs:unique>
+					<xs:unique name="unique-contact-details-name">
+						<xs:selector xpath="contact-details"></xs:selector>
+						<xs:field xpath="@name"></xs:field>
+					</xs:unique>
+					<xs:unique name="unique-license-details-name">
+						<xs:selector xpath="license-details"></xs:selector>
+						<xs:field xpath="@name"></xs:field>
+					</xs:unique>
+					<xs:unique name="unique-terms-of-service-name">
+						<xs:selector xpath="terms-of-service"></xs:selector>
+						<xs:field xpath="@name"></xs:field>
+					</xs:unique>
+					<xs:unique name="unique-tag-name">
+						<xs:selector xpath="tag"></xs:selector>
+						<xs:field xpath="@name"></xs:field>
+					</xs:unique>
+					<xs:unique name="unique-token-name">
+						<xs:selector xpath="token"></xs:selector>
+						<xs:field xpath="@name"></xs:field>
+					</xs:unique>
+					<xs:unique name="unique-oauth2-name">
+						<xs:selector xpath="oauth2"></xs:selector>
+						<xs:field xpath="@name"></xs:field>
+					</xs:unique>
+					<xs:unique name="unique-throttling-name">
+						<xs:selector xpath="throttling"></xs:selector>
+						<xs:field xpath="@name"></xs:field>
+					</xs:unique>
+				</xs:element>
+				<xs:element name="info">
+					<xs:annotation>
+						<xs:documentation>Provide details about the API, including its version, terms of service, and license information. All these details will be added to the <b>help document</b>. Addedly, the version and limit details will be used for automation and SDK generation.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="description" />
+							<xs:choice minOccurs="0">
+								<xs:element name="terms-of-service" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>Give the details of terms of service of the API as an <b>MD String</b>.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element ref="terms-of-service-ref" />
+							</xs:choice>
+							<xs:choice minOccurs="0" maxOccurs="unbounded">
+								<xs:element name="contact-details" type="contact-details">
+									<xs:annotation>
+										<xs:documentation>Provide the contact information for <b>users to get in touch</b> or reach out for assistance. This content will be added to the help documentation.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element ref="contact-details-ref" />
+							</xs:choice>
+							<xs:choice minOccurs="0">
+								<xs:element ref="license-details" />
+								<xs:element ref="license-details-ref" />
+							</xs:choice>
+						</xs:sequence>
+						<xs:attribute name="title" type="any-string" use="required">
+							<xs:annotation>
+								<xs:documentation>Give a title for the API help document.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="version" type="version-string" use="required">
+							<xs:annotation>
+								<xs:documentation>Mention the API version. This attribute follows the semantic versioning format - major.minor.patch (e.g., 1.0.0, 2.1, or 3), where the major version is required, and each part is a non-negative integer.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="limit" type="xs:positiveInteger">
+							<xs:annotation>
+								<xs:documentation>Mention the limitations that you want to be added to the help documentation for the resource if any. Also when automation cases are generated, the limit will be taken into consideration. For example, when you mention limit="100" for Module resource, the maximum possible number of modules in CRM is 100. This will be published in help documents. This limit will also be covered as an automation case.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+					<xs:unique name="unique-contact-details">
+						<xs:selector xpath="contact-details|contact-details-ref"></xs:selector>
+						<xs:field xpath="@name"></xs:field>
+					</xs:unique>
+				</xs:element>
+				<xs:element name="resource-config">
+					<xs:annotation>
+						<xs:documentation>Give additional <b>details about the resource</b>.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="path-config" />
+						</xs:sequence>
+						<xs:attribute name="primary-type" default="simple">
+							<xs:annotation>
+								<xs:documentation>It decides the behaviour of the primary keys.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="simple">
+										<xs:annotation>
+											<xs:documentation>Each and every primary property will function as an individual primary key.</xs:documentation>
+										</xs:annotation>
+									</xs:enumeration>
+									<xs:enumeration value="composite">
+										<xs:annotation>
+											<xs:documentation>All the primary properties will function together as a single primary key.</xs:documentation>
+										</xs:annotation>
+									</xs:enumeration>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="primary-structure" type="name-string">
+							<xs:annotation>
+								<xs:documentation>Give the <b>name</b> of the core structure of the resource.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:anyAttribute processContents="lax" />
+					</xs:complexType>
+				</xs:element>
+				<xs:choice maxOccurs="unbounded">
+					<xs:element ref="server" />
+					<xs:element ref="server-ref" />
+				</xs:choice>
+				<xs:element name="url" type="url" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Give the endpoint details along with the possible operations in this element.</xs:documentation>
+					</xs:annotation>
+					<xs:unique name="unique-operation-name">
+						<xs:selector xpath="operation"></xs:selector>
+						<xs:field xpath="@name"></xs:field>
+					</xs:unique>
+				</xs:element>
+				<xs:element ref="authentication" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Give details related to the authentication of an operation or resource.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="authentication-schema" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Give details about the authentication type for the opertation and the related URLs in this element.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:choice maxOccurs="unbounded">
+							<xs:element ref="token" />
+							<xs:element ref="token-ref" />
+							<xs:element ref="oauth2" />
+							<xs:element ref="oauth2-ref" />
+						</xs:choice>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="dependency" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>This element is <b>mandatory</b> only when you have used the <b>data of another resource</b> in your current resource.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="resources" type="xs:string" use="required">
+							<xs:annotation>
+								<xs:documentation>Specify the name of the dependent resource.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="product" type="name-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Mention the name of the product that you choose in ZEST UI.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="name" type="resource-string" use="required">
+				<xs:annotation>
+					<xs:documentation>Give a name for the resource and this name should be unique for a particular product.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="file-version" type="xs:string" />
+			<xs:attributeGroup ref="spec-version" />
+			<xs:attribute name="pre-loaded" type="xs:boolean" use="required">
+				<xs:annotation>
+					<xs:documentation>If the resource has data at initial state (when the new account is created) mention true, otherwise mention false.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute ref="visibility" />
+			<xs:anyAttribute processContents="lax" />
+		</xs:complexType>
+		<xs:unique name="unique-server">
+			<xs:selector xpath="server|server-ref"></xs:selector>
+			<xs:field xpath="@name"></xs:field>
+		</xs:unique>
+		<xs:unique name="unique-url-path">
+			<xs:selector xpath="url"></xs:selector>
+			<xs:field xpath="@path"></xs:field>
+		</xs:unique>
+	</xs:element>
+</xs:schema>

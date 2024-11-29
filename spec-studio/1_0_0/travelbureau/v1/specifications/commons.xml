@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource name="commons" product="travelbureau" pre-loaded="true" specification="1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../xsd/spec.xsd">
+    <components>
+        <!-- Success Response & Structures -->
+        <structure ref-name="SuccessActionResponse" cases="Success">
+            <property name="code" type="string" values="SUCCESS" required-for="response">
+                <description>Denotes whether the API call was successfully processed.</description>
+            </property>
+            <property name="status" type="string" values="success" required-for="response">
+                <description>Represents the status of the API call.</description>
+            </property>
+            <property name="details" type="map" required-for="response">
+                <structure>
+                    <property name="id" type="long_string" required-for="response" />
+                </structure>
+            </property>
+        </structure>
+
+        <structure name="ActionResponse" ref-name="DeleteActionResponse" extend="SuccessActionResponse">
+            <property name="message" type="string" values="Record Deleted" required-for="response">
+                <description>Represents the status of the API call.</description>
+            </property>
+        </structure>
+
+        <response name="CreateSuccess" status="201">
+            <description>This is the success response for CREATE operation of this resource.</description>
+            <content>
+                <encode type="application/json"/>
+                <path-config data-extraction-path="$.details" />
+                <structure name="ActionResponse" extend="SuccessActionResponse">
+                    <property name="message" type="string" values="Record Created" required-for="response">
+                        <description>Details about result of the API call.</description>
+                    </property>
+                </structure>
+            </content>
+        </response>
+
+        <response name="UpdateSuccess" status="200">
+            <description>This is the success response for UPDATE operation of this resource.</description>
+            <content>
+                <encode type="application/json"/>
+                <path-config data-extraction-path="$.details" />
+                <structure name="ActionResponse" extend="SuccessActionResponse">
+                    <property name="message" type="string" values="Record Updated" required-for="response">
+                        <description>Represents the status of the API call.</description>
+                    </property>
+                </structure>
+            </content>
+        </response>
+
+        <!-- Error Response & Structures -->
+        <structure ref-name="ErrorActionResponse">
+            <property name="details" type="map" required-for="response">
+                <description>Provides the error details.</description>
+                <structure>
+                    <property name="api_name" type="string" required-for="response">
+                        <description>The key name in which the error occurred.</description>
+                    </property>
+                    <property name="json_path" type="string" required-for="response">
+                        <description>Holds the JSON path of the key in which the error occured.</description>
+                    </property>
+                </structure>
+            </property>
+            <property name="status" type="string" values="error" required-for="response">
+                <description>Represents the status of the API call.</description>
+            </property>
+        </structure>
+
+        <structure name="ActionResponse" ref-name="MandatoryNotFoundActionResponse" extend="ErrorActionResponse" cases="Mandatory,Null">
+            <property name="code" type="string" values="MANDATORY_NOT_FOUND">
+                <description>The API call is a failure as the mandatory keys were not provided.</description>
+            </property>
+            <property name="message" type="string" values="Required field not found">
+                <description>Provide the mandatory keys as specified in the request JSON keys.</description>
+            </property>
+        </structure>
+
+        <structure name="ActionResponse" ref-name="InvalidRequestBodyActionResponse" extend="ErrorActionResponse" cases="InvalidValue,MaxLength,MinLength,EmptyRoot,EmptyValue,Regex">
+            <property name="code" required-for="all" type="string" values="INVALID_DATA"/>
+            <property name="message" required-for="all" type="string" values="The given data is invalid"/>
+        </structure>
+
+        <structure name="ActionResponse" ref-name="DuplicateDataActionResponse" extend="ErrorActionResponse" cases="Unique">
+            <property name="code" type="string" values="DUPLICATE_DATA" required-for="response">
+                <description>The API call was a failure due to duplicate values in unique keys.</description>
+            </property>
+            <property name="message" type="string" values="Record already exists" required-for="response">
+                <description>You have provided a duplicate value for a key. Check for the request JSON keys to know the unique keys and provide a valide value. </description>
+            </property>
+        </structure>
+
+        <structure name="ActionResponse" ref-name="InvalidDataTypeActionResponse" extend="ErrorActionResponse" cases="InvalidType">
+            <property name="code" type="string" values="INVALID_DATA" required-for="response">
+                <description>The API call failed due to invalid data in the request payload.</description>
+            </property>
+            <property name="message" type="string" values="The given data type is invalid" required-for="response">
+                <description>You have provided an invalid data type value for a key. Provide a valid input that satisfies the data type denoted in the request JSON keys section.</description>
+            </property>
+        </structure>
+
+        <response name="InvalidParamResponse" status="400">
+            <content>
+                <encode type="application/json" />
+                <structure name="ActionResponse" extend="ErrorActionResponse" cases="EmptyParam,InvalidParam">
+                    <property name="code" type="string" values="INVALID_DATA" required-for="response">
+                        <description>The API call failed due to an invalid data.</description>
+                    </property>
+                    <property name="message" type="string" values="The given param value is invalid" required-for="response">
+                        <description>You have given an invalid value in the request parameter.</description>
+                    </property>
+                    <property name="details" type="map" required-for="response">
+                        <structure>
+                            <property name="param_name" type="string" required-for="response" example-value="ids">
+                                <description>The invalid parameter name.</description>
+                            </property>
+                        </structure>
+                    </property>
+                </structure>
+            </content>
+        </response>
+
+        <response name="ResourceNotFoundResponse" status="404">
+            <content>
+                <encode type="application/json" />
+                <structure name="ActionResponse" extend="ErrorActionResponse" cases="InvalidValueInURLPath">
+                    <property name="code" type="string" values="NOT_FOUND" required-for="response">
+                        <description>The API call failed due to an invalid request url.</description>
+                    </property>
+                    <property name="message" type="string" values="You have specified an invalid data in the URL." required-for="response">
+                        <description>You have given an invalid value in the URL. Refer to the server and endpoints section and provide a valid URL.</description>
+                    </property>
+                    <property name="details" type="map" required-for="response">
+                        <structure>
+                            <property name="resource_path_index" type="integer" required-for="response" example-value="1" />
+                        </structure>
+                    </property>
+                </structure>
+            </content>
+        </response>
+
+        <response name="BadRequest" status="400">
+            <description>Following is a list of possible errors that could be made from the client side.</description>
+            <content>
+                <encode type="application/json"/>
+                <structure-group name="ErrorActionResponse" type="one-of">
+                    <structure-ref name="MandatoryNotFoundActionResponse"/>
+                    <structure-ref name="InvalidRequestBodyActionResponse" />
+                    <structure-ref name="DuplicateDataActionResponse"/>
+                    <structure-ref name="InvalidDataTypeActionResponse"/>
+                </structure-group>
+            </content>
+        </response>
+
+        <!--  Auth Schema & its components -->
+        <argument name="client_id" location="param" required="true">
+            <description>Client ID(consumer key) that you obtained during client registration.</description>
+            <content>
+                <encode type="text/plain"/>
+                <structure>
+                    <property type="string"/>
+                </structure>
+            </content>
+        </argument>
+        <argument name="redirect_uri" location="param" required="true">
+            <description>Callback URL that you specified during client registration.</description>
+            <content>
+                <encode type="text/plain"/>
+                <structure>
+                    <property type="string"/>
+                </structure>
+            </content>
+        </argument>
+        <argument name="client_secret" location="param" required="true">
+            <description>Specify client secret obtained from the connected app.</description>
+            <content>
+                <encode type="text/plain"/>
+                <structure>
+                    <property type="string"/>
+                </structure>
+            </content>
+        </argument>
+
+        <structure ref-name="AccessToken">
+            <property name="access_token" type="string" required-for="response">
+                <description>Access token to access TravelBureau APIs.</description>
+            </property>
+            <property name="expires_in" type="string" values="3600" required-for="response">
+                <description>Time in seconds after which the access token expires.</description>
+            </property>
+            <property name="api_domain" type="string" required-for="response">
+                <description>Domain name of the API. Use this domain in your requests to make API calls to Travel Bureau.</description>
+            </property>
+            <property name="token_type" type="string" values="Bearer" required-for="response">
+                <description>Type of token obtained. "Bearer" indicates this is an access token.</description>
+            </property>
+        </structure>
+
+        <oauth2 name="OAuth2Schema">
+            <authorization-url path="https://accounts.travel_bureau.com/oauth/v2/auth">
+                <operation category="action" method="get" name="Authorization Request">
+                    <description>To use the Travel Bureau APIs, the users must authenticate the application to make API calls on their behalf with an access token.</description>
+
+                    <argument name="scope" location="param" required="true">
+                        <description>Data that your application wants to access.</description>
+                        <content>
+                            <encode type="text/plain"/>
+                            <structure>
+                                <property type="string"/>
+                            </structure>
+                        </content>
+                    </argument>
+                    <argument-ref name="client_id"/>
+                    <argument name="response_type" location="param" required="true">
+                        <description>It decides the type of response.</description>
+                        <content>
+                            <encode type="text/plain"/>
+                            <structure>
+                                <property type="string" values="code"/>
+                            </structure>
+                        </content>
+                    </argument>
+                    <argument name="access_type" location="param" required="true">
+                        <description>Enter access_type as online or offline.</description>
+                        <content>
+                            <encode type="text/plain"/>
+                            <structure>
+                                <property type="string" values="offline,online"/>
+                            </structure>
+                        </content>
+                    </argument>
+                    <argument-ref name="redirect_uri"/>
+
+                    <response status="200"/>
+                </operation>
+            </authorization-url>
+
+            <token-url path="https://accounts.travel_bureau.com/oauth/v2/token">
+                <operation category="action" method="post" name="Generate Access Token and Refresh Token">
+                    <description>OAuth2.0 requests are usually authenticated with an access token, which is passed as bearer token. To use this access token, you need to construct a normal HTTP request and include it in an Authorization header along with the value of Bearer.</description>
+
+                    <argument name="grant_type" location="param" required="true">
+                        <description>It is crucial to select the appropriate grant type to ensure the security and integrity of the authentication and authorization process. Thus, the only possible value is **authorization_code**.</description>
+                        <content>
+                            <encode type="text/plain"/>
+                            <structure>
+                                <property type="string" values="authorization_code"/>
+                            </structure>
+                        </content>
+                    </argument>
+                    <argument-ref name="client_id"/>
+                    <argument-ref name="client_secret"/>
+                    <argument name="code" location="param" required="true">
+                        <description>Enter the grant token generated from authorization.</description>
+                        <content>
+                            <encode type="text/plain"/>
+                            <structure>
+                                <property type="string"/>
+                            </structure>
+                        </content>
+                    </argument>
+                    <argument-ref name="redirect_uri"/>
+
+                    <response status="200">
+                        <content>
+                            <encode type="application/json"/>
+                            <structure name="RefreshToken" extend="AccessToken">
+                                <property name="refresh_token" type="string">
+                                    <description>Refresh token to obtain new access tokens.</description>
+                                </property>
+                            </structure>
+                        </content>
+                    </response>
+                </operation>
+            </token-url>
+
+            <refresh-url path="https://accounts.travel_bureau.com/oauth/v2/token">
+                <operation category="action" method="post" name="Refresh Access Token">
+                    <description>Access tokens expire after an hour of generation. To generate a new access token, use the refresh token you generated earlier.</description>
+
+                    <argument name="refresh_token" location="param" required="true">
+                        <description>Provide the refresh token received using the token URL.</description>
+                        <content>
+                            <encode type="text/plain"/>
+                            <structure>
+                                <property type="string"/>
+                            </structure>
+                        </content>
+                    </argument>
+                    <argument-ref name="client_id"/>
+                    <argument-ref name="client_secret"/>
+                    <argument name="grant_type" location="param" required="true">
+                        <description>It is crucial to select the appropriate grant type to ensure the security and integrity of the authentication and authorization process. Thus, the only possible value is **refresh_token**.</description>
+                        <content>
+                            <encode type="text/plain"/>
+                            <structure>
+                                <property type="string" values="refresh_token"/>
+                            </structure>
+                        </content>
+                    </argument>
+
+                    <response status="200">
+                        <content>
+                            <encode type="application/json"/>
+                            <structure-ref name="AccessToken" />
+                        </content>
+                    </response>
+                </operation>
+            </refresh-url>
+
+            <authentication-url path="https://accounts.travel_bureau.com/oauth/user/info">
+                <operation category="action" method="get" name="Check Access Token">
+                    <description>This URL will authenticate the token and identifies the user.</description>
+                    <response status="200">
+                        <content>
+                            <encode type="application/json"/>
+                            <structure name="UserInfo">
+                                <property name="Id" type="long_string" required-for="response">
+                                    <description>The User ID of the user.</description>
+                                </property>
+                                <property name="Email" type="string" required-for="response">
+                                    <description>Email ID of the user.</description>
+                                </property>
+                                <property name="First_Name" type="string" required-for="response">
+                                    <description>First Name of the user.</description>
+                                </property>
+                                <property name="Last_Name" type="string" required-for="response">
+                                    <description>Last Name of the user.</description>
+                                </property>
+                                <property name="Display_Name" type="string" required-for="response">
+                                    <description>The display name of the user.</description>
+                                </property>
+                            </structure>
+                        </content>
+                    </response>
+                </operation>
+            </authentication-url>
+        </oauth2>
+
+        <!-- Server -->
+        <server dc="US" name="TravelBureauAPIServer" url="https://travelbureauapis.com">
+            <description>Travel Bureau is hosted only in the US data center. Powering our travel services, this server provides swift access to destination details, booking services, real-time weather updates, and personalized itinerary planning. Explore the API's capabilities and integrate seamlessly into your applications for an enhanced travel experience. </description>
+
+            <environment location="header" name="env" type="development" value="DEVELOPMENT">
+                <description>Development of products takes place in this environment. Specify this parameter to use the resource in development environment.</description>
+            </environment>
+            <environment location="header" name="env" type="sandbox" value="SANDBOX">
+                <description>Sandbox is an isolated environment, which helps you to test the product without affecting the application.</description>
+            </environment>
+        </server>
+
+        <!-- Info -->
+        <contact-details name="Travel Bureau Support" email="support@travelbureau.com" url="https://www.travel_bureau.com/resources/support-plans.html"/>
+        <terms-of-service name="Terms and Conditions">This API sternly follows the data usage and privacy policy, API Access Agreement, liability and indemnification. These terms of services are subject to modification and updates.</terms-of-service>
+        <license-details name="Apache License 2" url="https://www.apache.org/licenses/LICENSE-2.0"/>
+    </components>
+
+    <info title="Common components" version="1">
+        <description>Common components</description>
+    </info>
+
+    <resource-config>
+        <path-config data-extraction-path="$" />
+    </resource-config>
+
+    <server-ref name="TravelBureauAPIServer"/>
+
+    <url path="/">
+        <operation category="read" method="get" name="Get Home Page">
+            <response status="200" />
+        </operation>
+    </url>
+</resource>

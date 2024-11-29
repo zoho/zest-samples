@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource name="trips" product="travelbureau" pre-loaded="false" specification="1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../xsd/spec.xsd">
+    <components>
+        <structure ref-name="Trip">
+            <property name="name" type="string" required-for="all" unique-for="all">
+                <description>Name of the trip.</description>
+            </property>
+            <property name="id" type="long_string" include-for="Request[update], Response[read]" required-for="all">
+                <description>The unique record ID of the trip.</description>
+            </property>
+            <property name="destination" type="string" path="destinations:$.name" required-for="all">
+                <description>Destination of the trip.</description>
+            </property>
+            <property name="start_time" type="datetime" required-for="all">
+                <description>The starting time of the trip.</description>
+            </property>
+            <property name="end_time" type="datetime" required-for="all" format="yyyy-MM-dd'T'HH:mm:ss+/-hh:mm" value-condition="> REQUEST:body.start_time">
+                <description>The ending time of the trip.</description>
+            </property>
+            <property name="no_of_days" type="integer" required-for="all">
+                <description>The total number of trip days.</description>
+            </property>
+            <property name="transport_medium" type="string" required-for="all" values="Roadways,Airways,Waterways,Hybrid" default-value="Roadways" extra-value="map-default">
+                <description>Your preferred medium of transport.</description>
+            </property>
+            <property name="hybrid_details" type="string" condition-for-all="$.body.transport_medium == 'Hybrid'" required-for="all">
+                <description>Elaborate your hybrid details and the list of your preferred medium of transport.</description>
+            </property>
+            <property name="accommodation_type" type="string" required-for="all" values="Hotel,Resort,Vacation Rental,Hostel" default-value="Hotel" invalid-value="map-default">
+                <description>Type of your accommodation.</description>
+            </property>
+            <property name="trip_budget" type="integer" required-for="all">
+                <description>Budget of your trip.</description>
+            </property>
+            <property name="adventure_activities" type="object">
+                <extend-property condition-for-all="'Automation' :: REQUEST:$.header.service" length="3,-1" type="collections">
+                    <description>List of adventure activities according to the suggestions of traveler(s).</description>
+                    <structure>
+                        <property type="string"/>
+                    </structure>
+                </extend-property>
+                <extend-property condition-for-all="REQUEST:$.header.service == null || REQUEST:$.header.service != Automation" type="boolean">
+                    <description>
+Denotes whether adventure activities can be included in the trip. 
+    - **true**: Adventure activities will be included in the trip. 
+    - **false**: Adventure activities are not included in the trip.
+                    </description>
+                </extend-property>
+            </property>
+        </structure>
+
+        <request-body name="TripBody">
+            <content>
+                <encode type="application/json" />
+                <structure-ref name="Trip" />
+            </content>
+        </request-body>
+
+        <argument name="ids" location="param" length="200" delimiter="," style="delimiter">
+            <description>Specify the id(s) for which the operation has to take place.</description>
+            <content>
+                <encode type="text/plain"/>
+                <structure>
+                    <property path="trips:$.id" type="long"/>
+                </structure>
+            </content>
+        </argument>
+
+        <argument location="header" name="service" visibility="internal">
+            <description>Specify the service from which the resource is consumed.</description>
+            <content>
+                <encode type="text/plain"/>
+                <structure>
+                    <property type="string" values="Automation,Audit,QA"/>
+                </structure>
+            </content>
+        </argument>
+    </components>
+
+    <info title="Trips" version="1">
+        <description>Trips holds details such as trip itineraries, departure and arrival information, and other relevant data regarding a trip in the Travel Bureau. It offers all four CRUD operations for the effective management of records in the resource.</description>
+
+        <terms-of-service-ref name="commons.Terms and Conditions"/>
+        <contact-details-ref name="commons.Travel Bureau Support"/>
+        <license-details-ref name="commons.Apache License 2"/>
+    </info>
+    
+    <resource-config primary-structure="Trip">
+        <path-config data-extraction-path="$">
+            <primary path="$.id"/>
+        </path-config>
+    </resource-config>
+
+    <server-ref name="commons.TravelBureauAPIServer"/>
+
+    <url path="/api/v1/trips">
+        <operation category="read" method="get" name="Get trips">
+            <description>This operation fetches the trips details available in the Travel Bureau. You can also provide the IDs of the records to get only the details of particular records.</description>
+
+            <argument-ref name="ids"/>
+            <argument-ref name="service"/>
+
+            <response status="200">
+                <content>
+                    <encode type="application/json" />
+                    <path-config data-extraction-path="$.trips" />
+                    <structure name="TripsWrapper">
+                        <property name="trips" type="collections" required-for="response">
+                            <structure-ref name="Trip" />
+                        </property>
+                    </structure>
+                </content>
+            </response>
+            <response-ref name="commons.InvalidParamResponse" />
+
+            <authentication location="header" name="Authorization" schema="commons.OAuth2Schema" scopes="TravelBureau.trips.READ" type="oauth2"/>
+        </operation>
+
+        <operation category="create" method="post" name="Add Trip">
+            <description>It helps you to add new trips to the Travel Bureau.</description>
+
+            <argument-ref name="service"/>
+
+            <request-body-ref name="TripBody"/>
+
+            <response-ref name="commons.CreateSuccess"/>
+            <response-ref name="commons.BadRequest"/>
+
+            <authentication location="header" name="Authorization" schema="commons.OAuth2Schema" scopes="TravelBureau.trips.CREATE" type="oauth2"/>
+        </operation>
+
+        <operation category="update" method="put" name="Update Trip">
+            <description>It aids you in updating the details of the existing trips data in the Travel Bureau.</description>
+
+            <argument-ref name="service"/>
+
+            <request-body-ref name="TripBody"/>
+
+            <response-ref name="commons.UpdateSuccess"/>
+            <response-ref name="commons.BadRequest"/>
+
+            <authentication location="header" name="Authorization" schema="commons.OAuth2Schema" scopes="TravelBureau.trips.UPDATE" type="oauth2"/>
+        </operation>
+
+        <operation category="delete" method="delete" name="Delete Trip">
+            <description>This helps you to delete the existing trips records in the Travel Bureau.</description>
+
+            <argument-ref name="ids"/>
+
+            <response status="200">
+                <content>
+                    <encode type="application/json" />
+                    <path-config data-extraction-path="$.trips" />
+                    <structure name="TripsWrapper">
+                        <property name="trips" type="collections" required-for="response">
+                            <structure-ref name="commons.DeleteActionResponse" />
+                        </property>
+                    </structure>
+                </content>
+            </response>
+            <response-ref name="commons.InvalidParamResponse" />
+
+            <authentication location="header" name="Authorization" schema="commons.OAuth2Schema" scopes="TravelBureau.trips.DELETE" type="oauth2"/>
+        </operation>
+    </url>
+
+    <authentication location="header" name="Authorization" schema="commons.OAuth2Schema" scopes="TravelBureau.trips.ALL" type="oauth2"/>
+</resource>
